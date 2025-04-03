@@ -1,0 +1,1 @@
+Command :  npx react-native start --reset-cache
