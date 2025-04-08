@@ -1,0 +1,10 @@
+# React Native
+node_modules/
+android/.gradle/
+ios/Pods/
+*.log
+*.lock
+.env
+build/
+.idea/
+.DS_Store
