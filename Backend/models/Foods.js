@@ -1,0 +1,61 @@
+const mongoose = require("mongoose");
+require("./Restaurant")
+require("./User")
+
+const foodSchema = new mongoose.Schema({
+    title:{
+        type: String,    
+        required: true,
+    },
+    description:{
+        type: String,
+        required: true,
+    },
+    imageurl:{
+        type: String,
+        default: "https://domf5oio6qrcr.cloudfront.net/medialibrary/8371/bigstock-Hamburger-And-French-Fries-263887.jpg",
+    },
+    foodtags:{
+        type: String,
+        required: true,
+    },
+    creategory:{
+        type: String,
+        required: true,
+    },
+    code:{
+        type: String,
+        required: true,
+    },
+    isAvailable:{
+        type: Boolean,
+        default: true,
+    },
+    price:{
+        type: Number,
+        required: true,
+    },
+    rating:{
+        type: Number,
+        default: 1,
+        min: 0,
+        max: 5,
+    },
+    reviews:{
+        type: Number,
+        required: true,
+    },
+    restaurant:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Restaurant",
+        required: true,
+    },
+    createdBy:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
+});
+
+
+module.exports = mongoose.model("Food", foodSchema);
