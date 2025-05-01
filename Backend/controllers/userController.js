@@ -10,29 +10,31 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+
 const getUserById = async (req, res) => {
-    console.log(req.body.id) ;
-    try{
-        const user = await User.findById({_id : req.body.id});
-        if(!user){
-            return res.status(404).send({
-                message: "User not found",
-                success: false
-            })
-        }
-        res.status(200).send({
-            message: "User fetched successfully",
-            success: true,
-            data: user
-        })
-    } catch(error) {
-        res.status(500).send({
-            message: "Error in fetching user",
-            success: false,
-            error
-        })
+    console.log("params.id =", req.params.id);
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.status(404).send({
+          message: "User not found",
+          success: false,
+        });
+      }
+      res.status(200).send({
+        message: "User fetched successfully",
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: "Error in fetching user",
+        success: false,
+        error,
+      });
     }
 };
+
 
 const updateProfile = async (req, res) => {
     try{

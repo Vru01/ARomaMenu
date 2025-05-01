@@ -135,6 +135,8 @@ const deleteRestaurant = async (req, res) => {
     }
 }
 
+
+
 module.exports = {
     createRestaurant,
     getAllRestaurants,

@@ -9,7 +9,7 @@ const {
 
 
 router.get('/getallusers', authMiddleware , getAllUsers);
-router.get('/getuserid', authMiddleware , getUserById);
+router.get('/getuserid/:id', authMiddleware , getUserById);
 router.put('/updateuser', authMiddleware , updateProfile);
 router.post('/resetpassword' , authMiddleware , resetPassword);
 router.post('/updatepassword' , authMiddleware , updatePassword);

@@ -4,44 +4,28 @@ const User = require("../models/User");
 
 
 const createFood = async (req, res) => {
-    try{
-        const user = await User.findById({_id: req.body.id});
-        if (!user) {
-            return res.status(404).send({
-                message: "User not found",
-                success: false
-            });
-        }
-        if(user.role !== "manager") {
-            return res.status(403).send({
-                message: "You are not authorized to create a food",
-                success: false
-            })
-        }
-        // const restaurantname = await Restaurant.findById(req.body.restaurant);
-        // if (!restaurantname) {
-        //     return res.status(404).send({
-        //         message: "Restaurant not found",
-        //         success: false
-        //     });
-        // }
-        const { 
-            title, description, imageurl, foodtags, creategory, 
-        code, isAvailable, price, rating, reviews , isVeg, ARmodelUrl } = req.body;
+    try {
+        const user = await User.findById({ _id: req.body.id });
+
+        const {
+            title, description, imageurl, ARmodelUrl, category, isVeg, isAvailable,
+            price, rating, reviews, spiceLevel, speciality, ingredients } = req.body;
         
-        if(!title || !description || !foodtags || 
-            !creategory || !code   || !price || !reviews ) {
+        console.log("Request body:", req.body);
+        console.log({ title, description, category, price, reviews, speciality, ingredients });
+
+        if (!title || !description || !category || !price || !reviews ||
+            !speciality || !ingredients) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide all fields"
             });
         };
         const food = new Food({
-            title, description,
-            imageurl, foodtags,
-            creategory, code,
-            isAvailable,
-            price, rating, reviews, isVeg, ARmodelUrl,
+            title, description, imageurl, ARmodelUrl,
+            category, isVeg, isAvailable,
+            price, rating, reviews,
+            spiceLevel, speciality, ingredients,
             createdBy: user._id
         });
         await food.save();
@@ -49,9 +33,8 @@ const createFood = async (req, res) => {
             success: true,
             message: "Food created successfully",
             food,
-            // restaurantname,
             user
-        }); 
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -65,7 +48,7 @@ const createFood = async (req, res) => {
 const getAllFoods = async (req, res) => {
     try {
         const foods = await Food.find();
-        if(!foods){  
+        if (!foods) {
             return res.status(404).json({
                 success: false,
                 message: "No foods found"
@@ -85,11 +68,43 @@ const getAllFoods = async (req, res) => {
     }
 };
 
+const getFoodByCategory = async (req, res) => {
+    try {
+        const category = req.params.category;
+        if (!category) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide category"
+            });
+        }
+        const foods = await Food.find({ category: category });
+        if (foods.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No foods found for this category"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Foods fetched successfully for respective category",
+            foods
+        }); 
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error in fetching foods",
+            error
+        });
+    }
+};
 
+
+
+// need to be update
 const getFoodById = async (req, res) => {
     try {
         const food = await Food.findById(req.params.id);
-        if(!food){  
+        if (!food) {
             return res.status(404).json({
                 success: false,
                 message: "Food not found"
@@ -111,16 +126,16 @@ const getFoodById = async (req, res) => {
 
 
 const getFoodByRestaurantId = async (req, res) => {
-    try{
-        const restaurantId  = req.params.id;
-        if(!restaurantId){
+    try {
+        const restaurantId = req.params.id;
+        if (!restaurantId) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide restaurant id"
             });
         }
         const foods = await Food.find({ restaurant: restaurantId });
-        if(!foods){  
+        if (!foods) {
             return res.status(404).json({
                 success: false,
                 message: "No foods found for this restaurant"
@@ -142,26 +157,26 @@ const getFoodByRestaurantId = async (req, res) => {
 
 
 const updatefood = async (req, res) => {
-    try{
-        const user = await User.findById({_id: req.body.id});
+    try {
+        const user = await User.findById({ _id: req.body.id });
         const food = await Food.findById(req.params.id);
-        if( !food) {
+        if (!food) {
             return res.status(404).json({
                 success: false,
                 message: "Food not found"
-            }); 
+            });
         }
-        if( food.createdBy.toString() !== user._id.toString()) {
+        if (food.createdBy.toString() !== user._id.toString()) {
             return res.status(403).json({
                 success: false,
                 message: "You are not authorized to update this food"
             });
         }
         const {
-            title, description, imageurl, foodtags, creategory,
+            title, description, imageurl, category,
             isAvailable, price, rating, reviews } = req.body;
-        if(!title || !description || !foodtags ||
-            !creategory  || !price || !reviews) {
+        if (!title || !description ||
+            !category || !price || !reviews) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide all fields"
@@ -169,8 +184,10 @@ const updatefood = async (req, res) => {
         }
         const updatedfood = await Food.findByIdAndUpdate(
             req.params.id,
-            { title, description, imageurl, foodtags, creategory, 
-                isAvailable, price, rating, reviews },
+            {
+                title, description, imageurl, category,
+                isAvailable, price, rating, reviews
+            },
             { new: true }
         );
         return res.status(200).json({
@@ -189,16 +206,16 @@ const updatefood = async (req, res) => {
 
 
 const deleteFood = async (req, res) => {
-    try{
+    try {
         const food = await Food.findById(req.params.id);
-        if(!food){  
+        if (!food) {
             return res.status(404).json({
                 success: false,
                 message: "Food not found"
             });
         }
-        const user = await User.findById({_id: req.body.id});
-        if( food.createdBy.toString() !== user._id.toString() ) {
+        const user = await User.findById({ _id: req.body.id });
+        if (food.createdBy.toString() !== user._id.toString()) {
             return res.status(403).json({
                 success: false,
                 message: "You are not authorized to delete this food"
@@ -223,6 +240,7 @@ const deleteFood = async (req, res) => {
 module.exports = {
     createFood,
     getAllFoods,
+    getFoodByCategory,
     getFoodById,
     getFoodByRestaurantId,
     updatefood,

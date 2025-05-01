@@ -4,7 +4,7 @@ require("./User");
 
 const foodSchema = new mongoose.Schema({
     title: {
-        type: String,    
+        type: String,
         required: true,
     },
     description: {
@@ -15,23 +15,16 @@ const foodSchema = new mongoose.Schema({
         type: String,
         default: "https://domf5oio6qrcr.cloudfront.net/medialibrary/8371/bigstock-Hamburger-And-French-Fries-263887.jpg",
     },
-    ARmodelUrl:{
+    ARmodelUrl: {
         type: String,
         default: "",
     },
-    foodtags: {
+    category: {
         type: String,
         required: true,
+        // eg. burger cake pizza 
     },
-    creategory: {
-        type: String,
-        required: true,
-    },
-    code: {
-        type: String,
-        required: true,
-    },
-    isVeg:{
+    isVeg: {
         type: Boolean,
         default: true,
     },
@@ -45,7 +38,7 @@ const foodSchema = new mongoose.Schema({
     },
     rating: {
         type: Number,
-        default: 1,
+        default: 2,
         min: 0,
         max: 5,
     },
@@ -58,19 +51,18 @@ const foodSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    spiceLevel: { 
+    spiceLevel: {
         type: String,
-        enum: ['Spicy', 'More Spicy', 'Medium'],  
-        default: 'Medium',
+        enum: ['Spicy', 'More Spicy', 'Medium' , 'Non Spicy'],
+        default: 'Non Spicy',
     },
-    portionSize: { 
+    speciality: {
         type: String,
-        enum: ['Half Plate', 'Full Plate'],
-        default: 'Full Plate',
+        required: true,
     },
-    portionPrice: { 
-        type: Number,
-        default: 0,  
+    ingredients: {
+        type: String,
+        required: true,
     },
 });
 

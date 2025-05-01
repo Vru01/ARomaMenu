@@ -1,30 +1,27 @@
 const Order = require('../models/Order');
+const User = require('../models/User');
 
 
-const placeOrder = (req, res) => {
+const placeOrder = async (req, res) => {
     try{
-        const {cart, restaurantId} = req.body;
-        if(!cart || !restaurantId){
-            return res.status(400).send({
-                success: false,
-                message: 'please provide all the fields'
-            });
+        const user = await User.findById({ _id: req.body.id });
+        if (!user) {
+            return res.status(404).send({
+                message: "User not found",
+                success: false
+            })
         }
-        let totalPrice = 0 ;
-        cart.map((item) => {
-            totalPrice += item.price;
+        const { items, totalAmount } = req.body;
+        const order = new Order({
+            items,
+            totalAmount,
+            user: user._id,
         });
-        const newOrder = new Order({
-            foods:cart,
-            payment:totalPrice,
-            buyer: req.body.id,
-            restaurantId: restaurantId,
-        });
-        newOrder.save();
-        res.status(201).send({
+        await order.save();
+        res.status(201).send({  
             success: true,
             message: 'order placed successfully',
-            data: newOrder
+            data: order
         });
     } catch(error){
         console.log(error);
@@ -97,39 +94,11 @@ const updateOrderStatus = (req, res) => {
     }
 };
 
-const getAllOrdersBYRestaurant = async (req, res) => {
-    try{
-        const restaurantId = req.params.id ;
-        if(!restaurantId){
-            return res.status(400).send({
-                success: false,
-                message: 'please provide restaurant id'
-            });
-        }
-        const orders = await Order.find({restaurantId: restaurantId});
-        if(!orders){
-            return res.status(404).send({
-                success: false,
-                message: 'no orders found'
-            });
-        }
-        res.status(200).send({
-            success: true,
-            message: 'all orders fetched successfully',
-            data: orders
-        });
-    } catch(error){
-        res.status(500).send({ 
-            success: false,
-            message: 'error in getting all orders',
-            error: error.message 
-        });
-    }
-};
+
 
 module.exports = {
     placeOrder,
     cancelOrder,
     updateOrderStatus,
-    getAllOrdersBYRestaurant
+    
 };

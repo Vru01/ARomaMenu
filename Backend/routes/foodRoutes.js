@@ -4,13 +4,15 @@ const isManagerMiddleware = require('../middlewares/isManagerMiddleware');
 const router = express.Router();
 
 const { 
-    createFood , getAllFoods , getFoodById ,
+    createFood , getAllFoods, getFoodByCategory , getFoodById ,
     getFoodByRestaurantId , updatefood , deleteFood
 } = require('../controllers/foodController');
 
 
-router.post('/create', authMiddleware, createFood );
+router.post('/create', authMiddleware, isManagerMiddleware, createFood );
 router.get('/getallfoods', getAllFoods);
+router.get('/getfoodbycategory/:category', getFoodByCategory);
+
 router.get('/getfood/:id', getFoodById);
 router.get('/getfoodbyrestaurant/:id', getFoodByRestaurantId);
 router.put('/updatefood/:id', authMiddleware, isManagerMiddleware, updatefood);

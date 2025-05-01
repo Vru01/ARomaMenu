@@ -1,37 +1,39 @@
-const mongoose = require('mongoose');
-require('./Foods') ;
-require('./User') ;
-require('./Restaurant') ;
-
+const mongoose = require("mongoose");
+require("./User");
 
 const orderSchema = new mongoose.Schema({
-    foods: [
-        {    
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Food',
-            required: true
-        }
-    ],
-    payment:{
-        type: Number,
-        required: true
-    },
-    buyer:{
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    restaurantId:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Restaurant",
+        ref: "User",
         required: true,
     },
-    status:{
+    items: [
+        {
+            food: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Food",
+                required: true,
+            },
+            quantity: {
+                type: Number,
+                default: 1,
+                min: 1,
+            }
+        }
+    ],
+    totalAmount: {
+        type: Number,
+        required: true,
+    },
+    status: {
         type: String,
-        enum: ['preparing', 'preapare', 'on the way', 'delivered', 'cancelled'],
-        default: 'preparing'
+        enum: ["Pending", "Preparing", "Delivered", "Cancelled"],
+        default: "Pending",
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
     }
-},{timestamps: true});
+});
 
-
-module.exports = mongoose.model('Order', orderSchema);
+module.exports = mongoose.model("Order", orderSchema);
